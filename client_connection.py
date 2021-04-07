@@ -58,4 +58,4 @@ async def new_connection(websocket, path):
 
 
 ssl = tls.generate_ssl_context()
-start = websockets.serve(new_connection, "localhost", 2093, ssl=ssl)
+start = websockets.serve(new_connection, host="192.168.87.110", port=2093, ssl=ssl)
