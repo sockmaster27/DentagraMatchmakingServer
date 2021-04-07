@@ -22,13 +22,15 @@ async def new_connection(websocket, path):
         connection_closed(websocket)
 
 
-async def send(data: bytes) -> bool:
+async def send(data: bytes) -> (bool, str):
     if len(game_servers) == 0:
-        return False
+        return False, ""
     else:
         # Her ville den optimale server skulle findes
-        await game_servers[0].send(data)
-        return True
+        chosen_server = game_servers[0]
+        address = chosen_server.remote_address[0]
+        await chosen_server.send(data)
+        return True, address
 
 client_cert = os.path.join("TLS", "game_server_cert.pem")
 # TODO: godkend kun servere med dette certifikat

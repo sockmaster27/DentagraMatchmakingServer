@@ -14,6 +14,7 @@ token_length = 64
 timeout = 10
 
 NO_MATCH = 4000
+NO_SERVER = 4001
 
 
 unpaired_socket = None
@@ -25,19 +26,24 @@ async def new_connection(websocket, path):
     print("New client connected")
 
     if unpaired_socket is not None:
-        timestamp = math.floor(time.time()).to_bytes(4, "big")
+        timestamp = math.floor(time.time()).to_bytes(length=4, byteorder="little", signed=False)
         token1 = secrets.token_bytes(token_length)
         token2 = secrets.token_bytes(token_length)
 
-        await unpaired_socket.send(token1 + timestamp)
-        await websocket.send(token2 + timestamp)
+        game_server_found, address = await game_server_connection.send(token1 + token2 + timestamp)
 
-        game_server_found = await game_server_connection.send(token1 + token2 + timestamp)
-
-        if game_server_found:
-            print("Two clients paired \n")
-        else:
+        if not game_server_found:
             print("No game servers available \n")
+
+            await unpaired_socket.close(code=NO_SERVER)
+            await websocket.close(code=NO_SERVER)
+        else:
+            print("Two clients paired \n")
+
+            address_bytes = address.encode("utf-8")
+
+            await unpaired_socket.send(token1 + timestamp + address_bytes)
+            await websocket.send(token2 + timestamp + address_bytes)
 
         unpaired_socket = None
 
