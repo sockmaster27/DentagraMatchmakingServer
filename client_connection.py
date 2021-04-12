@@ -57,5 +57,6 @@ async def new_connection(websocket, path):
             print("Client disconnected \n")
 
 
-ssl = tls.generate_ssl_context()
-start = websockets.serve(new_connection, host="192.168.87.110", port=2093, ssl=ssl)
+def create_server(host: str, port: int):
+    ssl = tls.generate_ssl_context()
+    return websockets.serve(new_connection, host, port, ssl=ssl)

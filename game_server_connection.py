@@ -32,7 +32,9 @@ async def send(data: bytes) -> (bool, str):
         await chosen_server.send(data)
         return True, address
 
-client_cert = os.path.join("TLS", "game_server_cert.pem")
-# TODO: godkend kun servere med dette certifikat
-ssl = tls.generate_ssl_context()
-start = websockets.serve(new_connection, host="192.168.87.110", port=2094, ssl=ssl)
+
+def create_server(host: str, port: int):
+    client_cert = os.path.join("TLS", "game_server_cert.pem")
+    # TODO: godkend kun servere med dette certifikat
+    ssl = tls.generate_ssl_context()
+    return websockets.serve(new_connection, host, port, ssl=ssl)

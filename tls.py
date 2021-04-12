@@ -2,7 +2,12 @@ import ssl
 import os
 from typing import Optional
 
-from common import check_for_confidential_file
+
+def check_for_confidential_file(path):
+    if not os.path.exists(path):
+        raise RuntimeError(
+            f"{path} does not exist. Please generate new certificate, or request a copy from project owners."
+        )
 
 
 certificate_path = os.path.join("TLS", "matchmaking_cert.pem")
