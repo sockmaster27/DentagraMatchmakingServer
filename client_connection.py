@@ -49,12 +49,17 @@ async def new_connection(websocket, path):
 
     else:
         unpaired_socket = websocket
-        await asyncio.sleep(timeout)
 
-        if unpaired_socket is websocket:
+        try:
+            await asyncio.wait_for(websocket.recv(), timeout)
+        except websockets.exceptions.ConnectionClosed:
             unpaired_socket = None
-            await websocket.close(code=NO_MATCH)
             print("Client disconnected \n")
+        else:
+            if unpaired_socket is websocket:
+                unpaired_socket = None
+                await websocket.close(code=NO_MATCH)
+                print("Client disconnected \n")
 
 
 def create_server(host: str, port: int):
