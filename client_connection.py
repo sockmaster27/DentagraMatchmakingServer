@@ -55,7 +55,7 @@ async def new_connection(websocket, path):
         except websockets.exceptions.ConnectionClosed:
             unpaired_socket = None
             print("Client disconnected \n")
-        else:
+        except asyncio.exceptions.TimeoutError:
             if unpaired_socket is websocket:
                 unpaired_socket = None
                 await websocket.close(code=NO_MATCH)
